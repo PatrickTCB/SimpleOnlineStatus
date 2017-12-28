@@ -4,10 +4,10 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "net.phn1.patrick.onlinestatus"
-        minSdkVersion 26
+        minSdkVersion 24
         targetSdkVersion 26
-        versionCode 110
-        versionName "1.2"
+        versionCode 111
+        versionName "1.2.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
