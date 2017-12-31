@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Simple Online Status</string>
+    <string name="connStat">Checking connection...</string>
+    <string name="ipStat">Getting IP...</string>
 </resources>

@@ -27,6 +27,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class MainActivity extends AppCompatActivity {
     public TextView ipText;
+    public TextView conn;
     public boolean isConnected;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,23 +35,29 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        TextView conn = (TextView) findViewById(R.id.connection);
-        conn.setText(getNetworkInfo());
+        conn = (TextView) findViewById(R.id.connection);
         ipText = (TextView) findViewById(R.id.ip);
-        updateIP();
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                resetText();
                 Snackbar.make(view, "Status refreshed", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 TextView mainTextView = (TextView) findViewById(R.id.connection);
                 mainTextView.setText(getNetworkInfo());
-                updateIP();
+                UpdateIP uip = new UpdateIP();
+                uip.execute();
             }
         });
     }
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        conn.setText(getNetworkInfo());
+        UpdateIP uip = new UpdateIP();
+        uip.execute();
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -72,6 +79,11 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }*/
+
+    public void resetText() {
+        conn.setText(R.string.connStat);
+        ipText.setText(R.string.ipStat);
+    }
     public String getNetworkInfo() {
         String networkStatus = "Not connected :(";
         boolean isWiFi;
@@ -92,19 +104,29 @@ public class MainActivity extends AppCompatActivity {
         networkStatus = networkStatus + "\n\nLast checked: " + lastChecked;
         return networkStatus;
     }
-    public void updateIP() {
-        GetIP ip = new GetIP();
-        ip.start();
-        ipText.setText(ip.ip);
-        try {
-            ip.join();
-            ipText.setText(ip.ip);
-        } catch (InterruptedException e) {
-            ipText.setText("Error getting IP address");
+    public class UpdateIP extends AsyncTask<Void, Void, Void> {
+        public String ipAdd;
+        @Override
+        protected Void doInBackground(Void... params) {
+            GetIP ip = new GetIP();
+            ipText.setText(R.string.ipStat);
+            ip.start();
+            try {
+                ip.join();
+                ipAdd = ip.ip;
+            } catch (InterruptedException e) {
+                ipText.setText("Error getting IP.");
+            }
+            return null;
+        }
+
+        @Override
+        public void onPostExecute(Void param) {
+            ipText.setText(ipAdd);
         }
     }
     public class GetIP extends Thread {
-        public String ip = "Getting IP";
+        public String ip;
         public void run() {
             if (isConnected) {
                 HttpsURLConnection connection;
@@ -124,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
                         ip = "IP: " + body;
                     }
                 } catch (SocketTimeoutException e) {
-                    ip = "Timeout getting IP.";
+                    ip = "Could not get IP. Connection is very bad.";
                 } catch (IOException e) {
                     ip = "\nUnexpected error when getting IP";
                 }
