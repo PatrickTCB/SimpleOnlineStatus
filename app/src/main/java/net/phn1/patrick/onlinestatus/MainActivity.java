@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        conn.setText(R.string.connStat);
+        resetText();
         conn.setText(getNetworkInfo());
         UpdateIP uip = new UpdateIP();
         uip.execute();
@@ -110,7 +110,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
             GetIP ip = new GetIP();
-            ipText.setText(R.string.ipStat);
             ip.start();
             try {
                 ip.join();
@@ -124,6 +123,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onPostExecute(Void param) {
             ipText.setText(ipAdd);
+        }
+
+        @Override
+        public void onCancelled() {
+            ipText.setText("IP address check cancelled.");
         }
     }
     public class GetIP extends Thread {
