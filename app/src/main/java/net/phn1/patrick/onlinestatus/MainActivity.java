@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
+        conn.setText(R.string.connStat);
         conn.setText(getNetworkInfo());
         UpdateIP uip = new UpdateIP();
         uip.execute();
